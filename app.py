@@ -8,8 +8,9 @@
 # ==========================================================
 import os
 from dotenv import load_dotenv
-from flask import Flask, app
-from supabase import create_client
+from flask import Flask
+from supabase import create_client, Client
+
 
 app = Flask(__name__)
 
@@ -21,12 +22,19 @@ key = os.environ.get("SUPABASE_KEY")
 
 supabase = create_client(url, key)
 
+@app.route('/')
+def home():
+    """ This is the landing page. We can change this to the login later! """
+    return "<h1>The Debuggers: Project Online</h1><p>Database Connection: ACTIVE</p>"
+
 #Eyeruh' space
 
 
 
 
 #Faizan's space
+
+
 
 #starting server
 if __name__ == '__main__':
