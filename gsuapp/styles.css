@@ -1,0 +1,446 @@
+/* ===================================
+   GSU BRAND COLORS & VARIABLES
+   =================================== */
+:root {
+    /* Official GSU Colors */
+    --gsu-blue: #0039A6;
+    --gsu-white: #FFFFFF;
+    
+    /* Supporting Colors */
+    --gsu-light-blue: #E6F0FF;
+    --gsu-dark-blue: #002C7F;
+    --gsu-hover-blue: #0042B8;
+    
+    /* Neutral Colors */
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+    
+    /* Status Colors */
+    --error-red: #DC2626;
+    --error-bg: #FEE2E2;
+    --success-green: #059669;
+    --warning-yellow: #D97706;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    
+    /* Typography */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 2rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===================================
+   GLOBAL STYLES
+   =================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, var(--gsu-light-blue) 0%, var(--gsu-white) 50%, var(--gsu-light-blue) 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    line-height: 1.5;
+    color: var(--gray-800);
+}
+
+/* ===================================
+   LOGIN CONTAINER
+   =================================== */
+.login-container {
+    background: var(--gsu-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 450px;
+    padding: var(--spacing-xl);
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===================================
+   HEADER SECTION
+   =================================== */
+.login-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--gsu-blue);
+}
+
+.gsu-logo {
+    margin-bottom: var(--spacing-md);
+}
+
+.gsu-title {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--gsu-blue);
+    margin-bottom: var(--spacing-xs);
+}
+
+.app-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+/* ===================================
+   ERROR MESSAGE (GENERIC)
+   =================================== */
+.error-message {
+    background-color: var(--error-bg);
+    color: var(--error-red);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    border-left: 4px solid var(--error-red);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-icon {
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+}
+
+#errorText {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+/* ===================================
+   FORM STYLES
+   =================================== */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.form-label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.form-input {
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    transition: all 0.2s ease;
+    background-color: var(--gsu-white);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--gsu-blue);
+    box-shadow: 0 0 0 3px rgba(0, 57, 166, 0.1);
+}
+
+.form-input::placeholder {
+    color: var(--gray-400);
+}
+
+/* Input Error State */
+.form-input.error {
+    border-color: var(--error-red);
+}
+
+.form-input.error:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Field-specific Error Messages */
+.field-error {
+    font-size: var(--font-size-xs);
+    color: var(--error-red);
+    display: none;
+    margin-top: var(--spacing-xs);
+}
+
+.field-error.show {
+    display: block;
+}
+
+/* ===================================
+   FORM OPTIONS (Remember Me & Forgot Password)
+   =================================== */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: calc(var(--spacing-md) * -1);
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.remember-me input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--gsu-blue);
+}
+
+.checkbox-label {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    cursor: pointer;
+}
+
+.forgot-password {
+    font-size: var(--font-size-sm);
+    color: var(--gsu-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+    color: var(--gsu-hover-blue);
+    text-decoration: underline;
+}
+
+/* ===================================
+   LOGIN BUTTON (GSU BLUE)
+   =================================== */
+.login-button {
+    background-color: var(--gsu-blue);
+    color: var(--gsu-white);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.login-button:hover {
+    background-color: var(--gsu-hover-blue);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.login-button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.login-button:disabled {
+    background-color: var(--gray-400);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading Spinner */
+.spinner {
+    display: inline-block;
+}
+
+.spinner-icon {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===================================
+   SIGN UP LINK
+   =================================== */
+.signup-link {
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--gray-200);
+}
+
+.link-primary {
+    color: var(--gsu-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.link-primary:hover {
+    color: var(--gsu-hover-blue);
+    text-decoration: underline;
+}
+
+/* ===================================
+   FOOTER
+   =================================== */
+.login-footer {
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--gray-200);
+    text-align: center;
+}
+
+.footer-text {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    margin-bottom: var(--spacing-sm);
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.footer-link {
+    font-size: var(--font-size-xs);
+    color: var(--gsu-blue);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+    color: var(--gsu-hover-blue);
+    text-decoration: underline;
+}
+
+.separator {
+    color: var(--gray-400);
+    font-size: var(--font-size-xs);
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+@media (max-width: 480px) {
+    .login-container {
+        padding: var(--spacing-lg);
+    }
+    
+    .gsu-title {
+        font-size: var(--font-size-lg);
+    }
+    
+    .app-title {
+        font-size: var(--font-size-base);
+    }
+    
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+    
+    .separator {
+        display: none;
+    }
+}
+
+/* ===================================
+   ACCESSIBILITY
+   =================================== */
+.form-input:focus-visible,
+.login-button:focus-visible,
+.forgot-password:focus-visible,
+.link-primary:focus-visible,
+.footer-link:focus-visible {
+    outline: 2px solid var(--gsu-blue);
+    outline-offset: 2px;
+}
+
+/* Screen reader only text */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
