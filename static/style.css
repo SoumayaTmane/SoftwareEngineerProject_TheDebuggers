@@ -1,0 +1,227 @@
+/* ==========================================================
+FILE: style.css (Frontend Design)
+----------------------------------------------------------
+
+*/
+/* ===================================
+   GSU COLORS
+   =================================== */
+:root {
+    --gsu-blue: #1f5edc;         /* LIGHTER BLUE BACKGROUND */
+    --gsu-dark-blue: #002C7F;    /* GLOW COLOR */
+    --gsu-bright-blue: #3b82f6;  /* OUTER GLOW */
+
+    --gsu-white: #FFFFFF;
+    --gray-300: #D1D5DB;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+
+    --radius-md: 0.5rem;
+    --radius-lg: 1rem;
+
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ===================================
+   GLOBAL
+   =================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--gsu-blue); /* LIGHTER BLUE */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+}
+
+/* ===================================
+   LOGIN CONTAINER
+   =================================== */
+.login-container {
+    background: var(--gsu-white);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 450px;
+    padding: var(--spacing-xl);
+    position: relative;
+
+    /* BOLD GLOW EFFECT */
+    border: 3px solid var(--gsu-dark-blue);
+
+    box-shadow:
+        0 0 10px rgba(0, 44, 127, 0.8),
+        0 0 30px rgba(59, 130, 246, 0.7),
+        0 0 60px rgba(59, 130, 246, 0.5),
+        0 25px 45px rgba(0, 0, 0, 0.25);
+
+    animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* Glow Animation */
+@keyframes glowPulse {
+    0% {
+        box-shadow:
+            0 0 10px rgba(0, 44, 127, 0.8),
+            0 0 30px rgba(59, 130, 246, 0.7),
+            0 0 60px rgba(59, 130, 246, 0.5),
+            0 25px 45px rgba(0, 0, 0, 0.25);
+    }
+    50% {
+        box-shadow:
+            0 0 15px rgba(0, 44, 127, 1),
+            0 0 40px rgba(59, 130, 246, 0.9),
+            0 0 80px rgba(59, 130, 246, 0.7),
+            0 25px 45px rgba(0, 0, 0, 0.3);
+    }
+    100% {
+        box-shadow:
+            0 0 10px rgba(0, 44, 127, 0.8),
+            0 0 30px rgba(59, 130, 246, 0.7),
+            0 0 60px rgba(59, 130, 246, 0.5),
+            0 25px 45px rgba(0, 0, 0, 0.25);
+    }
+}
+
+/* ===================================
+   HEADER
+   =================================== */
+.login-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--gsu-dark-blue);
+}
+
+.gsu-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gsu-dark-blue);
+}
+
+.app-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+/* ===================================
+   FORM
+   =================================== */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.form-input {
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--gsu-dark-blue);
+    box-shadow: 0 0 0 3px rgba(0, 44, 127, 0.25);
+}
+
+/* ===================================
+   BUTTON
+   =================================== */
+.login-button {
+    background-color: var(--gsu-dark-blue);
+    color: white;
+    border: none;
+    padding: var(--spacing-md);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.login-button:hover {
+    background-color: #001f5c;
+    transform: translateY(-2px);
+}
+
+/* ===================================
+   FOOTER
+   =================================== */
+.login-footer {
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.footer-text {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-bottom: var(--spacing-sm);
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.footer-link {
+    font-size: 0.75rem;
+    color: var(--gsu-dark-blue);
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+}
+/* GSU-Themed Error Box */
+.error-message {
+    background-color: #fff5f5; /* Light red tint */
+    color: #cc0000;            /* Deep red for text */
+    border-left: 5px solid #0039A6; /* GSU Blue accent stripe on the side */
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.error-icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+#errorText {
+    font-weight: 500;
+}

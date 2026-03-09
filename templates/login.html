@@ -1,1 +1,82 @@
 <!-- html for the frontend login page -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSU Lost & Found - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <!-- GSU Branding Header -->
+        <div class="login-header">
+            <div class="gsu-logo">
+                
+                <h1 class="gsu-title">Georgia State University</h1>
+            </div>
+            <h2 class="app-title">Lost & Found System</h2>
+        </div>
+
+    <form action="/login" method="POST" id="loginForm" class="login-form">
+
+        <div class="form-group">
+            <label for="campus_id" class="form-label">CampusID</label>
+            <input 
+                type="text" 
+                id="campus_id" 
+                name="campus_id" 
+                class="form-input" 
+                placeholder="e.g. tjohnson1"
+                required
+            >
+        </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                >
+                <span class="field-error" id="passwordError"></span>
+            </div>
+            
+            <!-- Error Message Container, this will be displayed if there are any login errors -->
+           {% with messages = get_flashed_messages() %}
+            {% if messages %}
+        <div id="errorMessage" class="error-message" style="display: block;">
+            <span class="error-icon">⚠️</span>
+            <span id="errorText">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </span>
+        </div>
+      {% endif %}
+    {% endwith %} 
+            
+
+            <!-- Submit Button -->
+            <button type="submit" id="loginButton" class="login-button">
+                <span id="buttonText">Log In</span>
+                <span id="loadingSpinner" class="spinner" style="display: none;">
+                    <span class="spinner-icon">◌</span>
+                </span>
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <p class="footer-text">© 2025 Georgia State University</p>
+            
+        </div>
+    </div>
+
+    
+</body>
+</html>

@@ -2,39 +2,31 @@
 # FILE: app.py (Main Backend)
 # ----------------------------------------------------------
 # TEAM RESPONSIBILITIES:
-# - Soumaya: Initializing Supabase, Flask, and Server setup.
-# - EYERUH: Create the login function & Supabase query logic.
-# - FAIZAN: Handle validation (errors)
+# - 
 # ==========================================================
-import os
-from dotenv import load_dotenv
-from flask import Flask, render_template
-from supabase import create_client, Client
-
+from flask import Flask, render_template, request, session, redirect, url_for
+from auth import login_user
 
 app = Flask(__name__)
 
-# This line loads the variables from the .env file
-load_dotenv()
 
-url = os.environ.get("SUPABASE_URL")
-key = os.environ.get("SUPABASE_KEY")
-
-supabase = create_client(url, key)
+app.secret_key = "debuggers_secret_key_2026" #used for flash mangment
 
 @app.route('/')
 def home():
     """ This is the landing page. We can change this to the login later! """
-    return "<h1>The Debuggers: Project Online</h1><p>Database Connection: ACTIVE</p>"
+    return  render_template('login.html')
 
-#Eyeruh' space
+@app.route('/login', methods=['POST'])
+def login():
+    return login_user(request.form) 
 
-
-
-
-#Faizan's space
-
-
+@app.route('/dashboard')
+def dashboard():
+    
+    if 'campus_id' in session:
+        return f"Welcome to the Dashboard, {session['campus_id']}!"
+    return redirect(url_for('home'))
 
 #starting server
 if __name__ == '__main__':
