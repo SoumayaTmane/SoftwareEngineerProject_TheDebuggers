@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GSU Lost & Found Dashboard</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div style="padding: 10px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; 
+                  color: {{ 'green' if category == 'success' else 'red' }}; 
+                  background-color: {{ '#d4edda' if category == 'success' else '#f8d7da' }};">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+    <h1>Welcome to the Dashboard, {{ session['campus_id'] }}!</h1>
+    
+    <div class="items-list">
+        {% for item in items %}
+    <div style="border: 1px solid #ccc; margin: 10px; padding: 10px; border-radius: 8px;">
+        <h3 style="display: inline;">{{ item.item_name }}</h3>
+        <span style="padding: 2px 8px; border-radius: 4px; color: black; font-size: 0.8em; margin-left: 10px; background-color: {{ 'red' if item.status == 'Lost' else 'yellow' if item.status == 'At front desk' else 'green' }};"> 
+            {{ item.status }}
+        </span>
+
+        <p><strong>Posted by:</strong> {{ item['user_account']['f_name'] }}</p>
+        
+        <p>{{ item.description }}</p>
+        
+        <p><strong>Location:</strong> {{ item.building.building_name }}</p>
+
+        <p style="font-size: 0.8em; color: gray;">
+            <strong>Reported on:</strong> 
+            {% if item.created_at %}
+                {{ item.created_at[:10] }}
+            {% else %}
+                Recently
+            
+            {% endif %}
+        </p>
+        {% if session['role'] == 'staff' or item.reporterid == session['campus_id'] %}
+    <form action="/delete-post/{{ item.postid }}" method="POST" style="margin-top: 10px;">
+        <button type="submit" 
+                onclick="return confirm('Are you sure you want to delete this report?')"
+                style="background-color: transparent; border: 1px solid red; color: red; cursor: pointer; border-radius: 4px;">
+            Delete Post
+        </button>
+    </form>
+{% endif %}
+    </div>
+{% endfor %}
+        
+
+
+    </div>
+    
+    <a href="/logout">Logout</a>
+
+    <button onclick="document.getElementById('reportModal').style.display='block'">
+    Report Lost/Found Item
+</button>
+
+<div id="reportModal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
+    <div style="background-color:white; margin:15% auto; padding:20px; border:1px solid #888; width:50%;">
+        <span onclick="document.getElementById('reportModal').style.display='none'" style="float:right; cursor:pointer;">&times;</span>
+        
+        <h2>Report an Item</h2>
+        
+        <form action="/report-item" method="POST">
+            <p>
+                <label>Item Name:</label><br>
+                <input type="text" name="item_name" required placeholder="e.g. Blue Hydroflask">
+            </p>
+            
+            <p>
+                <label>Description:</label><br>
+                <textarea name="description" placeholder="Where was it? Any identifying marks?"></textarea>
+            </p>
+            
+            <p>
+                <label>I have:</label><br>
+                <select name="status" required>
+                <option value="Lost">Lost this item</option>
+                <option value="At front desk">Found this item (At Front Desk)</option>
+                </select>
+            </p>
+
+            <p>
+                <label>Building:</label><br>
+                <select name="building_id" required>
+                    <option value="">-- Select a Building --</option>
+                    {% for b in buildings %}
+                        <option value="{{ b.buildingid }}">{{ b.building_name }}</option>
+                    {% endfor %}
+                </select>
+            </p>
+
+            <button type="submit">Submit Report</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
