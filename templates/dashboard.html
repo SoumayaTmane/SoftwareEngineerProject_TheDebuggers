@@ -1,105 +1,690 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>GSU Lost & Found Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSU Lost & Found</title>
+    <!-- Google Fonts : DM Sans for body text and Playfairl Display for Headings -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue:        #0039A6;  /* GSU Primary blue */
+            --blue-dark:   #002C7F; /* Darker blue for nav and gradients */ 
+            --blue-light:  #E8EFFF; /* Very light blue for blue backgrounds tint */
+            --blue-mid:    #C5D5FF; /* Mid blue for subtle text on dark bg */ 
+            --white:       #FFFFFF;
+            --gray-50:     #F8F9FC; /* Page background */ 
+            --gray-100:    #F0F2F7;
+            --gray-200:    #DDE1EC; /* Border color */ 
+            --gray-400:    #8E97B0; /* Muted text */ 
+            --gray-600:    #4A5270; /* Secondary text */ 
+            --gray-800:    #1C2340; /* Primary text */ 
+            --lost:        #C0392B; /* Red -Lost item label */ 
+            --lost-bg:     #FDECEA;
+            --found:       #1A7F5A; /* Green - Found item label */
+            --found-bg:    #E6F6F0;
+            --desk:        #B45309; /* Amber - At front desk label */ 
+            --desk-bg:     #FEF3E2;
+        }
+ 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+        }
+ 
+        /* ---- NAV ---- */
+        .nav {
+            background: var(--blue-dark);
+            padding: 0 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+        }
+ 
+        .nav-brand {
+            display: flex;
+            flex-direction: column;
+        }
+ 
+        .nav-brand span:first-child {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--white);
+            letter-spacing: 0.01em;
+        }
+ 
+        .nav-brand span:last-child {
+            font-size: 0.72rem;
+            color: var(--blue-mid);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+ 
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+ 
+        .nav-user {
+            font-size: 0.85rem;
+            color: var(--blue-mid);
+            font-weight: 500;
+        }
+ 
+        .nav-user strong {
+            color: var(--white);
+        }
+ 
+        .btn-logout {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--white);
+            background: transparent;
+            border: 1.5px solid rgba(255,255,255,0.35);
+            padding: 0.45rem 1.1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.18s, border-color 0.18s;
+            letter-spacing: 0.03em;
+        }
+ 
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.6);
+        }
+ 
+        /* ---- HERO STRIP ---- */
+        .hero {
+            background: linear-gradient(120deg, var(--blue) 0%, var(--blue-dark) 100%);
+            padding: 2.5rem 2.5rem 2rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+ 
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--white);
+            line-height: 1.2;
+            margin-bottom: 0.35rem;
+        }
+ 
+        .hero-text p {
+            font-size: 0.9rem;
+            color: var(--blue-mid);
+            font-weight: 400;
+        }
+ 
+        .btn-report {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--white);
+            color: var(--blue-dark);
+            border: none;
+            padding: 0.75rem 1.6rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            letter-spacing: 0.02em;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+            white-space: nowrap;
+        }
+ 
+        .btn-report:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+        }
+ 
+        /* ---- FLASH MESSAGES ---- */
+        .messages {
+            padding: 1rem 2.5rem 0;
+        }
+ 
+        .alert {
+            padding: 0.75rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.6rem;
+            border-left: 4px solid;
+        }
+ 
+        .alert-success {
+            background: var(--found-bg);
+            color: var(--found);
+            border-left-color: var(--found);
+        }
+ 
+        .alert-danger {
+            background: var(--lost-bg);
+            color: var(--lost);
+            border-left-color: var(--lost);
+        }
+ 
+        /* ---- MAIN CONTENT ---- */
+        .main {
+            padding: 2rem 2.5rem 4rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+ 
+        /* ---- FILTER BAR ---- */
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+ 
+        .filter-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-right: 0.3rem;
+        }
+ 
+        .filter-btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            border: 1.5px solid var(--gray-200);
+            background: var(--white);
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+ 
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: var(--white);
+        }
+ 
+        /* ---- GRID ---- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+ 
+        /* ---- CARD ---- */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1.5px solid var(--gray-200);
+            padding: 1.4rem;
+            transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+ 
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,44,127,0.1);
+            border-color: var(--blue-mid);
+        }
+ 
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+ 
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            line-height: 1.3;
+        }
+ 
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            padding: 0.28rem 0.8rem;
+            border-radius: 20px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+ 
+        .badge-lost  { background: var(--lost-bg);  color: var(--lost);  }
+        .badge-found { background: var(--found-bg); color: var(--found); }
+        .badge-desk  { background: var(--desk-bg);  color: var(--desk);  }
+ 
+        .card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            padding: 0.75rem 0;
+            border-top: 1px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-100);
+        }
+ 
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            color: var(--gray-600);
+        }
+ 
+        .meta-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            opacity: 0.6;
+        }
+ 
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            line-height: 1.55;
+            flex: 1;
+        }
+ 
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.2rem;
+        }
+ 
+        .card-date {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+ 
+        .btn-delete {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.77rem;
+            font-weight: 600;
+            color: var(--lost);
+            background: transparent;
+            border: 1.5px solid var(--lost);
+            padding: 0.35rem 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            letter-spacing: 0.02em;
+        }
+ 
+        .btn-delete:hover {
+            background: var(--lost);
+            color: var(--white);
+        }
+ 
+        /* ---- EMPTY STATE ---- */
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 5rem 2rem;
+            background: var(--white);
+            border-radius: 12px;
+            border: 1.5px dashed var(--gray-200);
+        }
+ 
+        .empty-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+ 
+        .empty-sub {
+            font-size: 0.9rem;
+            color: var(--gray-400);
+        }
+ 
+        /* ---- MODAL ---- */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+ 
+        .overlay.open {
+            display: flex;
+        }
+ 
+        .modal {
+            background: var(--white);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 540px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.22);
+            animation: slideUp 0.22s ease;
+        }
+ 
+        @keyframes slideUp {
+            from { transform: translateY(24px); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+ 
+        .modal-head {
+            background: linear-gradient(120deg, var(--blue) 0%, var(--blue-dark) 100%);
+            padding: 1.4rem 1.8rem;
+            border-radius: 14px 14px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+ 
+        .modal-head h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--white);
+        }
+ 
+        .btn-close {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            font-size: 1.6rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.15s;
+        }
+ 
+        .btn-close:hover { color: var(--white); }
+ 
+        .modal-body {
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+ 
+        .field label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.45rem;
+        }
+ 
+        .field input,
+        .field select,
+        .field textarea {
+            font-family: 'DM Sans', sans-serif;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.92rem;
+            color: var(--gray-800);
+            background: var(--gray-50);
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+ 
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(0,57,166,0.1);
+            background: var(--white);
+        }
+ 
+        .field textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+ 
+        .field-hint {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            margin-top: 0.3rem;
+        }
+ 
+        .btn-submit {
+            font-family: 'DM Sans', sans-serif;
+            width: 100%;
+            background: var(--blue);
+            color: var(--white);
+            border: none;
+            padding: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.15s;
+            letter-spacing: 0.02em;
+            margin-top: 0.4rem;
+        }
+ 
+        .btn-submit:hover {
+            background: var(--blue-dark);
+            transform: translateY(-1px);
+        }
+ 
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 640px) {
+            .nav  { padding: 0 1.2rem; }
+            .hero { padding: 1.8rem 1.2rem 1.5rem; }
+            .hero-text h1 { font-size: 1.5rem; }
+            .main { padding: 1.5rem 1.2rem 3rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div style="padding: 10px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; 
-                  color: {{ 'green' if category == 'success' else 'red' }}; 
-                  background-color: {{ '#d4edda' if category == 'success' else '#f8d7da' }};">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
+ 
+<!-- NAV -->
+<nav class="nav">
+    <div class="nav-brand">
+        <span>Georgia State University</span>
+        <span>Lost &amp; Found</span>
+    </div>
+    <div class="nav-right">
+        <span class="nav-user">Signed in as <strong>{{ session['campus_id'] }}</strong></span>
+        <a href="/logout" class="btn-logout">Log out</a>
+    </div>
+</nav>
+ 
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-text">
+        <h1>Lost &amp; Found Items</h1>
+        <p>Browse reports or submit a new one below.</p>
+    </div>
+    <button class="btn-report" onclick="openModal()">+ Report Item</button>
+</div>
+ 
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endwith %}
-    <h1>Welcome to the Dashboard, {{ session['campus_id'] }}!</h1>
-    
-    <div class="items-list">
-        {% for item in items %}
-    <div style="border: 1px solid #ccc; margin: 10px; padding: 10px; border-radius: 8px;">
-        <h3 style="display: inline;">{{ item.item_name }}</h3>
-        <span style="padding: 2px 8px; border-radius: 4px; color: black; font-size: 0.8em; margin-left: 10px; background-color: {{ 'red' if item.status == 'Lost' else 'yellow' if item.status == 'At front desk' else 'green' }};"> 
-            {{ item.status }}
-        </span>
-
-        <p><strong>Posted by:</strong> {{ item['user_account']['f_name'] }}</p>
-        
-        <p>{{ item.description }}</p>
-        
-        <p><strong>Location:</strong> {{ item.building.building_name }}</p>
-
-        <p style="font-size: 0.8em; color: gray;">
-            <strong>Reported on:</strong> 
-            {% if item.created_at %}
-                {{ item.created_at[:10] }}
-            {% else %}
-                Recently
-            
-            {% endif %}
-        </p>
-        {% if session['role'] == 'staff' or item.reporterid == session['campus_id'] %}
-    <form action="/delete-post/{{ item.postid }}" method="POST" style="margin-top: 10px;">
-        <button type="submit" 
-                onclick="return confirm('Are you sure you want to delete this report?')"
-                style="background-color: transparent; border: 1px solid red; color: red; cursor: pointer; border-radius: 4px;">
-            Delete Post
-        </button>
-    </form>
-{% endif %}
+ 
+<!-- MAIN -->
+<div class="main">
+ 
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+        <span class="filter-label">Filter:</span>
+        <button class="filter-btn active" onclick="filterCards('all', this)">All</button>
+        <button class="filter-btn" onclick="filterCards('Lost', this)">Lost</button>
+        <button class="filter-btn" onclick="filterCards('At front desk', this)">At Front Desk</button>
     </div>
-{% endfor %}
-        
-
-
-    </div>
-    
-    <a href="/logout">Logout</a>
-
-    <button onclick="document.getElementById('reportModal').style.display='block'">
-    Report Lost/Found Item
-</button>
-
-<div id="reportModal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
-    <div style="background-color:white; margin:15% auto; padding:20px; border:1px solid #888; width:50%;">
-        <span onclick="document.getElementById('reportModal').style.display='none'" style="float:right; cursor:pointer;">&times;</span>
-        
-        <h2>Report an Item</h2>
-        
-        <form action="/report-item" method="POST">
-            <p>
-                <label>Item Name:</label><br>
-                <input type="text" name="item_name" required placeholder="e.g. Blue Hydroflask">
-            </p>
-            
-            <p>
-                <label>Description:</label><br>
-                <textarea name="description" placeholder="Where was it? Any identifying marks?"></textarea>
-            </p>
-            
-            <p>
-                <label>I have:</label><br>
-                <select name="status" required>
-                <option value="Lost">Lost this item</option>
-                <option value="At front desk">Found this item (At Front Desk)</option>
-                </select>
-            </p>
-
-            <p>
-                <label>Building:</label><br>
-                <select name="building_id" required>
-                    <option value="">-- Select a Building --</option>
-                    {% for b in buildings %}
-                        <option value="{{ b.buildingid }}">{{ b.building_name }}</option>
-                    {% endfor %}
-                </select>
-            </p>
-
-            <button type="submit">Submit Report</button>
-        </form>
+ 
+    <!-- GRID -->
+    <div class="grid" id="itemGrid">
+        {% if items %}
+            {% for item in items %}
+            <div class="card" data-status="{{ item.status }}">
+                <div class="card-top">
+                    <h3 class="card-title">{{ item.item_name }}</h3>
+                    {% if item.status == 'Lost' %}
+                        <span class="badge badge-lost">Lost</span>
+                    {% elif item.status == 'At front desk' %}
+                        <span class="badge badge-desk">At Front Desk</span>
+                    {% else %}
+                        <span class="badge badge-found">Found</span>
+                    {% endif %}
+                </div>
+ 
+                <div class="card-meta">
+                    <div class="meta-row">
+                        <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        {{ item['user_account']['f_name'] }} {{ item['user_account']['l_name'] }}
+                    </div>
+                    <div class="meta-row">
+                        <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        {{ item.building.building_name }}
+                    </div>
+                </div>
+ 
+                <p class="card-desc">{{ item.description }}</p>
+ 
+                <div class="card-footer">
+                    <span class="card-date">
+                        {% if item.created_at %}{{ item.created_at[:10] }}{% else %}Recently{% endif %}
+                    </span>
+                    {% if session['role'] == 'staff' or item.reporterid == session['campus_id'] %}
+                        <form action="/delete-post/{{ item.postid }}" method="POST" style="margin:0;">
+                            <button type="submit" class="btn-delete"
+                                onclick="return confirm('Delete this report?')">
+                                Delete
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty">
+                <h3 class="empty-title">No items reported yet</h3>
+                <p class="empty-sub">Be the first to report a lost or found item.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
+ 
+<!-- REPORT MODAL -->
+<div class="overlay" id="overlay">
+    <div class="modal">
+        <div class="modal-head">
+            <h2>Report an Item</h2>
+            <button class="btn-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form action="/report-item" method="POST">
+                <div class="field">
+                    <label for="item_name">Item Name</label>
+                    <input type="text" id="item_name" name="item_name"
+                           placeholder="e.g. Blue Hydroflask, Black Backpack" required>
+                    <p class="field-hint">Be specific so others can identify it.</p>
+                </div>
+ 
+                <div class="field">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description"
+                              placeholder="Color, brand, unique markings, where you last saw it..."></textarea>
+                </div>
+ 
+                <div class="field">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="Lost">I lost this item</option>
+                        <option value="At front desk">I found this item (at front desk)</option>
+                    </select>
+                </div>
+ 
+                <div class="field">
+                    <label for="building_id">Building</label>
+                    <select id="building_id" name="building_id" required>
+                        <option value="">-- Select a building --</option>
+                        {% for b in buildings %}
+                            <option value="{{ b.buildingid }}">{{ b.building_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+ 
+                <button type="submit" class="btn-submit">Submit Report</button>
+            </form>
+        </div>
+    </div>
+</div>
+ 
+<script>
+    const overlay = document.getElementById('overlay');
+ 
+    function openModal() {
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+ 
+    function closeModal() {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+ 
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeModal();
+    });
+ 
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+ 
+    function filterCards(status, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none';
+        });
+    }
+</script>
+ 
 </body>
 </html>
+
+
+
+
