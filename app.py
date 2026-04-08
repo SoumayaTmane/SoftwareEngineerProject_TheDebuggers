@@ -2,187 +2,142 @@
 # FILE: app.py (Main Backend)
 # ----------------------------------------------------------
 # TEAM RESPONSIBILITIES:
-# - Soumaya: Initializing Supabase, Flask, and Server setup.
-# - EYERUH: Create the login function & Supabase query logic.
-# - FAIZAN: Handle validation (errors)
+# - 
 # ==========================================================
-import os
-import secrets
-import datetime
-from dotenv import load_dotenv
-from flask import Flask, render_template, request, jsonify
-from supabase import create_client, Client
-from werkzeug.security import generate_password_hash, check_password
+from flask import Flask, flash, render_template, request, session, redirect, url_for
+from auth import login_user
+from config import supabase
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
-# This line loads the variables from the .env file
-load_dotenv()
 
-url = os.environ.get("SUPABASE_URL")
-key = os.environ.get("SUPABASE_KEY")
-
-supabase = create_client(url, key)
-
-# ==========================================================
-# HELPER FUNCTIONS
-# ==========================================================
-
-def hash_password(password):
-    """Hash a password using werkzeug"""
-    return generate_password_hash(password)
-
-def check_password(password, stored_hash):
-    """Check if password matches stored hash"""
-    return check_password(stored_hash, password)
-
-def generate_reset_token():
-    """Generate a secure random token"""
-    return secrets.token_urlsafe(32)
-
-# ==========================================================
-# LOGIN FUNCTION (Eyeruh's Space)
-# ==========================================================
-
-def login_user(data):
-    username = data.get("username")
-    password = data.get("password")
-
-    if not username or not password:
-        return jsonify({"error": "Invalid credentials"}), 400
-
-    user = supabase.table("users").select("*").eq("username", username).execute()
-
-    if not user.data:
-        return jsonify({"error": "Invalid credentials"}), 401
-
-    stored_hash = user.data[0]["password_hash"]
-
-    if check_password(password, stored_hash):
-        return jsonify({"message": "Login successful"}), 200
-    else:
-        return jsonify({"error": "Invalid credentials"}), 401
-
-# ==========================================================
-# PASSWORD RESET API ENDPOINTS (New Feature)
-# ==========================================================
-
-@app.route('/api/forgot-password', methods=['POST'])
-def forgot_password():
-    """
-    Endpoint to request password reset
-    Sends reset link to user's email (GSU email)
-    """
-    data = request.get_json()
-    email = data.get('email')
-    
-    if not email:
-        return jsonify({"error": "Email is required"}), 400
-    
-    # Check if user exists
-    user = supabase.table("users").select("*").eq("email", email).execute()
-    
-    if not user.data:
-        # Return generic message for security (don't reveal if email exists)
-        return jsonify({"message": "If your email is registered, you will receive a password reset link."}), 200
-    
-    # Generate reset token and expiry (valid for 1 hour)
-    reset_token = generate_reset_token()
-    expires_at = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
-    
-    # Store token in database
-    supabase.table("users").update({
-        "reset_token": reset_token,
-        "reset_token_expires_at": expires_at.isoformat()
-    }).eq("email", email).execute()
-    
-    # For development, we'll return the reset link in response
-    reset_link = f"{request.host_url}reset-password.html?token={reset_token}&email={email}"
-    
-    print(f"Password reset link: {reset_link}")
-    
-    # In production, you would send an actual email here
-    return jsonify({
-        "message": "Password reset link has been sent to your email.",
-        "reset_link": reset_link  # Remove this line in production!
-    }), 200
-
-@app.route('/api/reset-password', methods=['POST'])
-def reset_password():
-    """
-    Endpoint to reset password using token
-    """
-    data = request.get_json()
-    email = data.get('email')
-    token = data.get('token')
-    new_password = data.get('new_password')
-    
-    # Validate inputs
-    if not email or not token or not new_password:
-        return jsonify({"error": "All fields are required"}), 400
-    
-    # Validate password strength
-    if len(new_password) < 8:
-        return jsonify({"error": "Password must be at least 8 characters long"}), 400
-    
-    # Find user with valid reset token
-    user = supabase.table("users").select("*").eq("email", email).eq("reset_token", token).execute()
-    
-    if not user.data:
-        return jsonify({"error": "Invalid or expired reset token"}), 400
-    
-    user_data = user.data[0]
-    
-    # Check if token expired
-    expires_at = datetime.datetime.fromisoformat(user_data.get('reset_token_expires_at'))
-    if expires_at < datetime.datetime.utcnow():
-        return jsonify({"error": "Reset token has expired. Please request a new one."}), 400
-    
-    # Hash new password and update
-    new_password_hash = hash_password(new_password)
-    
-    supabase.table("users").update({
-        "password_hash": new_password_hash,
-        "reset_token": None,
-        "reset_token_expires_at": None
-    }).eq("email", email).execute()
-    
-    return jsonify({"message": "Password has been reset successfully!"}), 200
-
-@app.route('/api/login', methods=['POST'])
-def login():
-    """API endpoint for login"""
-    data = request.get_json()
-    return login_user(data)
-
-# ==========================================================
-# FRONTEND ROUTES
-# ==========================================================
+app.secret_key = "debuggers_secret_key_2026" #used for flash mangment
 
 @app.route('/')
 def home():
-    """Landing page"""
-    return "<h1>The Debuggers: Project Online</h1><p>Database Connection: ACTIVE</p>"
+    """ This is the landing page.  """
+    return  render_template('login.html')
 
-@app.route('/login.html')
-def login_page():
-    """Serve login page"""
-    return app.send_static_file('login.html')
+@app.route('/login', methods=['POST'])
+def login():
+    return login_user(request.form) 
 
-@app.route('/forgot-password.html')
-def forgot_password_page():
-    """Serve forgot password page"""
-    return app.send_static_file('forgot-password.html')
+@app.route('/dashboard')
+def dashboard():
+    # 1. THE SECURITY CHECK
+    if 'campus_id' not in session:
+        flash("Please log in to view the dashboard.")
+        return redirect(url_for('home'))
 
-@app.route('/reset-password.html')
-def reset_password_page():
-    """Serve reset password page"""
-    return app.send_static_file('reset-password.html')
+    selected_building = request.args.get('building')
+    selected_status = request.args.get('status')
 
-# ==========================================================
-# STARTING SERVER
-# ==========================================================
+    all_items = []
+    all_buildings = []
 
+    # 2. THE DATA FETCHING
+    try:
+        # Start the query 
+        query = supabase.table("post").select("""
+            *, 
+            building(building_name), 
+            user_account!post_reporterid_fkey(f_name, l_name)
+        """)
+
+        # 3. APPLY FILTERS)
+        if selected_building:
+            query = query.eq("buildingid", selected_building)
+        if selected_status:
+            query = query.eq("status", selected_status)
+
+        # 4. EXECUTE
+        response = query.execute()
+        all_items = response.data
+        
+        build_res = supabase.table("building").select("buildingid, building_name").execute()
+        all_buildings = build_res.data
+
+    except Exception as e:
+        
+        print(f"Error fetching data: {e}")
+
+    # 5. THE RENDERING
+    return render_template('dashboard.html', items=all_items, buildings=all_buildings)
+
+
+@app.route('/report-item', methods=['POST'])
+def report_item():
+    # 1. Who is logged in, so we can link the post to thier account
+    user_id = session.get('campus_id')
+    
+    if not user_id:
+        return redirect(url_for('home'))
+
+    # 2. Get the info from the modal form
+    new_post = {
+        "item_name": request.form.get('item_name'),
+        "description": request.form.get('description'),
+        "buildingid": int(request.form.get('building_id')), 
+        "reporterid": user_id,  # This links the post to the user account!
+        "status": request.form.get('status')
+    }
+
+    # 3. Save to Supabase
+    try:
+        supabase.table("post").insert(new_post).execute()
+        # A success message for the dashboard
+        return redirect(url_for('dashboard'))
+    except Exception as e:
+        print(f"Error inserting post: {e}")
+        return "There was an error saving your report.", 500
+
+# This route allows users to delete a post. Only staff can delete any post, while students can only delete their own posts.
+@app.route('/delete-post/<int:post_id>', methods=['POST'])
+def delete_post(post_id):
+    user_id = session.get('campus_id')
+    user_role = session.get('role')
+
+    if not user_id:
+        return redirect(url_for('home'))
+
+    try:
+        if user_role == 'staff':
+            supabase.table("post").delete().eq("postid", post_id).execute()
+        else:
+            supabase.table("post").delete().eq("postid", post_id).eq("reporterid", user_id).execute()
+        
+        flash("Post successfully deleted!", "success") 
+    except Exception as e:
+        print(f"Delete error: {e}")
+        flash("Error deleting post.", "danger")
+    
+    return redirect(url_for('dashboard'))
+
+#This route will allow staff to update the status of a post  and only the staff can see teh drowdown menu
+@app.route('/update_status/<int:post_id>', methods=['POST'])
+def update_status(post_id):
+    if session.get('role') != 'staff':
+        flash("Only staff can update post status.", "danger")
+        return redirect(url_for('dashboard'))
+
+    new_status = request.form.get('new_status')
+
+    try:
+        supabase.table("post").update({"status": new_status}).eq("postid", post_id).execute()
+        flash(f"Status updated to {new_status}!", "success")
+    except Exception as e:
+        print(f"Update error: {e}")
+        flash("Error updating status.", "danger")
+
+    return redirect(url_for('dashboard'))
+
+@app.route('/logout')
+def logout():
+    session.clear() # This wipes the campus_id and role from the session
+    
+    return redirect(url_for('home')) # Sends them back to the login page
+
+
+#starting server
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,2 @@
+# Security: Ignore the environment variables
+.env
