@@ -15,7 +15,7 @@ app.secret_key = "debuggers_secret_key_2026" #used for flash mangment
 
 @app.route('/')
 def home():
-    """ This is the landing page. We can change this to the login later! """
+    """ This is the landing page.  """
     return  render_template('login.html')
 
 @app.route('/login', methods=['POST'])
@@ -25,36 +25,49 @@ def login():
 @app.route('/dashboard')
 def dashboard():
     # 1. THE SECURITY CHECK
-    
     if 'campus_id' not in session:
         flash("Please log in to view the dashboard.")
         return redirect(url_for('home'))
+
+    selected_building = request.args.get('building')
+    selected_status = request.args.get('status')
+
     all_items = []
     all_buildings = []
 
     # 2. THE DATA FETCHING
-    # we now go to Supabase.
     try:
-        response = (
-            supabase.table("post")
-            .select("""*,  building(building_name), user_account!post_reporterid_fkey(f_name, l_name)""")
-            .execute()
-        )
+        # Start the query 
+        query = supabase.table("post").select("""
+            *, 
+            building(building_name), 
+            user_account!post_reporterid_fkey(f_name, l_name)
+        """)
+
+        # 3. APPLY FILTERS)
+        if selected_building:
+            query = query.eq("buildingid", selected_building)
+        if selected_status:
+            query = query.eq("status", selected_status)
+
+        # 4. EXECUTE
+        response = query.execute()
         all_items = response.data
         
         build_res = supabase.table("building").select("buildingid, building_name").execute()
         all_buildings = build_res.data
-    except Exception as e:
-        print(f"Error fetching data: {e}")
-        
 
-    # 3. THE RENDERING
-    # We send the items to the  dashboard.html template.
+    except Exception as e:
+        
+        print(f"Error fetching data: {e}")
+
+    # 5. THE RENDERING
     return render_template('dashboard.html', items=all_items, buildings=all_buildings)
+
 
 @app.route('/report-item', methods=['POST'])
 def report_item():
-    # 1. Who is logged in?
+    # 1. Who is logged in, so we can link the post to thier account
     user_id = session.get('campus_id')
     
     if not user_id:
@@ -98,6 +111,24 @@ def delete_post(post_id):
         print(f"Delete error: {e}")
         flash("Error deleting post.", "danger")
     
+    return redirect(url_for('dashboard'))
+
+#This route will allow staff to update the status of a post  and only the staff can see teh drowdown menu
+@app.route('/update_status/<int:post_id>', methods=['POST'])
+def update_status(post_id):
+    if session.get('role') != 'staff':
+        flash("Only staff can update post status.", "danger")
+        return redirect(url_for('dashboard'))
+
+    new_status = request.form.get('new_status')
+
+    try:
+        supabase.table("post").update({"status": new_status}).eq("postid", post_id).execute()
+        flash(f"Status updated to {new_status}!", "success")
+    except Exception as e:
+        print(f"Update error: {e}")
+        flash("Error updating status.", "danger")
+
     return redirect(url_for('dashboard'))
 
 @app.route('/logout')
